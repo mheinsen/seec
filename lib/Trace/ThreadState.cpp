@@ -974,6 +974,23 @@ void ThreadState::removePreviousEvent() {
 
 
 //------------------------------------------------------------------------------
+// Queries.
+//------------------------------------------------------------------------------
+
+FunctionState const *ThreadState::getParentOf(FunctionState const &F) const
+{
+  auto const It = std::find_if(CallStack.cbegin(), CallStack.cend(),
+                               [&] (std::unique_ptr<FunctionState> const &P) {
+                                 return P.get() == &F;});
+
+  if (It == CallStack.cbegin() || It == CallStack.cend())
+    return nullptr;
+
+  return std::prev(It)->get();
+}
+
+
+//------------------------------------------------------------------------------
 // Memory.
 //------------------------------------------------------------------------------
 

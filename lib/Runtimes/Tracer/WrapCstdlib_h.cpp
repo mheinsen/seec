@@ -220,7 +220,7 @@ public:
     auto const Caller = ThreadListener.getActiveFunction();
     assert(Caller && !Caller->isShim());
 
-    auto const Call = llvm::ImmutableCallSite(Caller->getActiveInstruction());
+    auto const Call = llvm::CallSite(Caller->getActiveInstruction());
     auto const KeyPtrObj   = Caller->getPointerObject(Call.getArgument(0));
     auto const ArrayPtrObj = Caller->getPointerObject(Call.getArgument(1));
 

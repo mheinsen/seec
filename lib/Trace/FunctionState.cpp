@@ -18,6 +18,7 @@
 #include "seec/Trace/ProcessState.hpp"
 #include "seec/Util/ModuleIndex.hpp"
 
+#include "llvm/Support/CallSite.h"
 #include "llvm/Support/raw_ostream.h"
 
 namespace seec {
@@ -91,7 +92,7 @@ llvm::Instruction const *FunctionState::getInstruction(uint32_t Index) const {
   return FunctionLookup->getInstruction(Index);
 }
 
-llvm::Instruction const *FunctionState::getActiveInstruction() const {
+llvm::Instruction *FunctionState::getActiveInstruction() const {
   if (!ActiveInstruction.assigned())
     return nullptr;
 
@@ -146,6 +147,17 @@ FunctionState::getCurrentRuntimeValue(llvm::Instruction const *I) const {
     return nullptr;
   
   return getCurrentRuntimeValue(MaybeIndex.get<0>());
+}
+
+FunctionState const *FunctionState::getCaller() const
+{
+  return Parent->getParentOf(*this);
+}
+
+llvm::Value *FunctionState::getCurrentCallArgument(unsigned N) const
+{
+  auto const Call = llvm::CallSite(getActiveInstruction());
+  return Call.getArgument(N);
 }
 
 std::vector<std::reference_wrapper<AllocaState const>>

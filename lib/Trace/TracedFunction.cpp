@@ -58,6 +58,20 @@ uintptr_t TracedFunction::getRuntimeAddress(llvm::Function const *F) const
   return ThreadListener.getRuntimeAddress(F);
 }
 
+TracedFunction const *TracedFunction::getCaller() const
+{
+  return ThreadListener.getParentOf(*this);
+}
+
+llvm::Value *TracedFunction::getCurrentCallArgument(unsigned N) const
+{
+  auto const Call = llvm::CallSite(ActiveInstruction);
+  if (!Call)
+    return nullptr;
+
+  return Call.getArgument(N);
+}
+
 
 //===----------------------------------------------------------------------===//
 // Accessors for active-only information.

@@ -644,6 +644,20 @@ void TraceThreadListener::traceOpen()
 // Accessors
 //------------------------------------------------------------------------------
 
+TracedFunction const *
+TraceThreadListener::getParentOf(TracedFunction const &F) const
+{
+  auto const It = std::find_if(FunctionStack.cbegin(), FunctionStack.cend(),
+                               [&] (TracedFunction const &Other) {
+                                 return &Other == &F;
+                               });
+
+  if (It == FunctionStack.cbegin() || It == FunctionStack.cend())
+    return nullptr;
+
+  return &*std::prev(It);
+}
+
 RuntimeValue const *
 TraceThreadListener::getCurrentRuntimeValue(llvm::Instruction const *I) const
 {
@@ -658,6 +672,22 @@ TraceThreadListener::getCurrentRuntimeValue(llvm::Instruction const *I) const
     return nullptr;
 
   return ActiveFunc->getCurrentRuntimeValue(MaybeIndex.get<0>());
+}
+
+TracedFunction const *TraceThreadListener::getCaller() const
+{
+  if (FunctionStack.size() < 2)
+    return nullptr;
+
+  return &FunctionStack[FunctionStack.size() - 2];
+}
+
+llvm::Value *TraceThreadListener::getCurrentCallArgument(unsigned N) const
+{
+  if (!ActiveFunction)
+    return nullptr;
+
+  return ActiveFunction->getCurrentCallArgument(N);
 }
 
 seec::Maybe<seec::MemoryArea>

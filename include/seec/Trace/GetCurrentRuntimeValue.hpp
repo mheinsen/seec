@@ -373,6 +373,18 @@ struct GetCurrentRuntimeValueAsImpl<RuntimeValue const *, void> {
 template<typename T, typename SrcTy>
 seec::Maybe<T>
 getCurrentRuntimeValueAs(SrcTy &Source, llvm::Value const *Value) {
+  if (auto const Arg = llvm::dyn_cast<llvm::Argument>(Value)) {
+    if (!Arg->hasByValAttr()) {
+      auto const Caller = Source.getCaller();
+      assert(Caller != nullptr);
+
+      auto const ArgValue = Source.getCurrentCallArgument(Arg->getArgNo());
+      assert(ArgValue != nullptr);
+
+      return getCurrentRuntimeValueAs<T>(*Caller, ArgValue);
+    }
+  }
+
   return GetCurrentRuntimeValueAsImpl<T>
           ::getCurrentRuntimeValueAs(Source, Value);
 }

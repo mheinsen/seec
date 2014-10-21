@@ -261,7 +261,7 @@ class TracedFunction {
   /// @{
   
   /// Currently-active Instruction.
-  llvm::Instruction const *ActiveInstruction;
+  llvm::Instruction *ActiveInstruction;
   
   /// Previously active \c BasicBlock.
   llvm::BasicBlock const *PreviousBasicBlock;
@@ -409,6 +409,14 @@ public:
   /// \return the run-time address of F, or 0 if it is not known.
   uintptr_t getRuntimeAddress(llvm::Function const *F) const;
   
+  /// \brief Get a pointer to this \c TracedFunction's parent.
+  ///
+  TracedFunction const *getCaller() const;
+
+  /// \brief Get the N-th value from the active function's active call.
+  ///
+  llvm::Value *getCurrentCallArgument(unsigned N) const;
+
   /// @} (Support getCurrentRuntimeValue.)
   
   
@@ -418,14 +426,14 @@ public:
   /// \brief Get the currently active llvm::Instruction, or nullptr if there
   ///        is none.
   ///
-  llvm::Instruction const *getActiveInstruction() const {
+  llvm::Instruction *getActiveInstruction() const {
     return ActiveInstruction;
   }
   
   /// \brief Set the currently active llvm::Instruction.
   ///
   void
-  setActiveInstruction(llvm::Instruction const * const NewActiveInstruction) {
+  setActiveInstruction(llvm::Instruction * const NewActiveInstruction) {
     ActiveInstruction = NewActiveInstruction;
 
     auto const BB = ActiveInstruction->getParent();

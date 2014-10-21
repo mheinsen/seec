@@ -88,11 +88,13 @@ void TraceThreadListener::notifyFunctionBegin(uint32_t Index,
   if (ActiveFunction) {
     if (!ActiveFunction->isShim()) {
       auto const Inst = ActiveFunction->getActiveInstruction();
-      if (auto const Call = llvm::dyn_cast<llvm::CallInst>(Inst)) {
+      auto const Call = llvm::CallSite(Inst);
+
+      if (Call) {
         // TODO: Ensure that the called Function is F.
         for (auto const &Arg : F->getArgumentList()) {
           if (Arg.getType()->isPointerTy()) {
-            auto const Operand = Call->getArgOperand(Arg.getArgNo());
+            auto const Operand = Call.getArgument(Arg.getArgNo());
             auto const Object = ActiveFunction->getPointerObject(Operand);
             PtrArgObjects[&Arg] = Object;
           }
@@ -374,7 +376,7 @@ void TraceThreadListener::notifyFunctionEnd(uint32_t const Index,
 }
 
 void TraceThreadListener::notifyPreCall(uint32_t Index,
-                                        llvm::CallInst const *CallInst,
+                                        llvm::CallInst *CallInst,
                                         void const *Address) {
   using namespace seec::trace::detect_calls;
 
@@ -402,7 +404,7 @@ void TraceThreadListener::notifyPostCall(uint32_t Index,
 }
 
 void TraceThreadListener::notifyPreCallIntrinsic(uint32_t Index,
-                                                 llvm::CallInst const *CI) {
+                                                 llvm::CallInst *CI) {
   using namespace seec::trace::detect_calls;
 
   // Handle common behaviour when entering and exiting notifications.
@@ -506,7 +508,7 @@ void TraceThreadListener::notifyPreAlloca(uint32_t const Index,
 }
 
 void TraceThreadListener::notifyPreLoad(uint32_t Index,
-                                        llvm::LoadInst const *Load,
+                                        llvm::LoadInst *Load,
                                         void const *Data,
                                         std::size_t Size) {
   // Handle common behaviour when entering and exiting notifications.
@@ -545,7 +547,7 @@ void TraceThreadListener::notifyPostLoad(uint32_t Index,
 }
 
 void TraceThreadListener::notifyPreStore(uint32_t Index,
-                                         llvm::StoreInst const *Store,
+                                         llvm::StoreInst *Store,
                                          void const *Data,
                                          std::size_t Size) {
   // Handle common behaviour when entering and exiting notifications.
@@ -711,7 +713,7 @@ void TraceThreadListener::notifyPreDivide(
 }
 
 void TraceThreadListener::notifyValue(uint32_t const Index,
-                                      llvm::Instruction const * const Instr)
+                                      llvm::Instruction * const Instr)
 {
   enterNotification();
   auto OnExit = scopeExit([this](){exitNotification();});
@@ -722,7 +724,7 @@ void TraceThreadListener::notifyValue(uint32_t const Index,
 }
 
 void TraceThreadListener::notifyValue(uint32_t Index,
-                                      llvm::Instruction const *Instruction,
+                                      llvm::Instruction * const Instruction,
                                       void *Value) {
   // Handle common behaviour when entering and exiting notifications.
   enterNotification();
@@ -848,7 +850,7 @@ void TraceThreadListener::notifyValue(uint32_t Index,
 }
 
 void TraceThreadListener::notifyValue(uint32_t Index,
-                                      llvm::Instruction const *Instruction,
+                                      llvm::Instruction * const Instruction,
                                       uint64_t Value) {
   // Handle common behaviour when entering and exiting notifications.
   enterNotification();
@@ -870,7 +872,7 @@ void TraceThreadListener::notifyValue(uint32_t Index,
 }
 
 void TraceThreadListener::notifyValue(uint32_t Index,
-                                      llvm::Instruction const *Instruction,
+                                      llvm::Instruction * const Instruction,
                                       uint32_t Value) {
   // Handle common behaviour when entering and exiting notifications.
   enterNotification();
@@ -892,7 +894,7 @@ void TraceThreadListener::notifyValue(uint32_t Index,
 }
 
 void TraceThreadListener::notifyValue(uint32_t Index,
-                                      llvm::Instruction const *Instruction,
+                                      llvm::Instruction * const Instruction,
                                       uint16_t Value) {
   // Handle common behaviour when entering and exiting notifications.
   enterNotification();
@@ -914,7 +916,7 @@ void TraceThreadListener::notifyValue(uint32_t Index,
 }
 
 void TraceThreadListener::notifyValue(uint32_t Index,
-                                      llvm::Instruction const *Instruction,
+                                      llvm::Instruction * const Instruction,
                                       uint8_t Value) {
   // Handle common behaviour when entering and exiting notifications.
   enterNotification();
@@ -936,7 +938,7 @@ void TraceThreadListener::notifyValue(uint32_t Index,
 }
 
 void TraceThreadListener::notifyValue(uint32_t Index,
-                                      llvm::Instruction const *Instruction,
+                                      llvm::Instruction * const Instruction,
                                       float Value) {
   // Handle common behaviour when entering and exiting notifications.
   enterNotification();
@@ -958,7 +960,7 @@ void TraceThreadListener::notifyValue(uint32_t Index,
 }
 
 void TraceThreadListener::notifyValue(uint32_t Index,
-                                      llvm::Instruction const *Instruction,
+                                      llvm::Instruction * const Instruction,
                                       double Value) {
   // Handle common behaviour when entering and exiting notifications.
   enterNotification();
@@ -980,7 +982,7 @@ void TraceThreadListener::notifyValue(uint32_t Index,
 }
 
 void TraceThreadListener::notifyValue(uint32_t Index,
-                                      llvm::Instruction const *Instruction,
+                                      llvm::Instruction * const Instruction,
                                       long double Value) {
   // Handle common behaviour when entering and exiting notifications.
   enterNotification();

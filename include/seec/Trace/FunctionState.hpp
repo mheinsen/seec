@@ -296,7 +296,7 @@ public:
   }
 
   /// \brief Get the active llvm::Instruction, if there is one.
-  llvm::Instruction const *getActiveInstruction() const;
+  llvm::Instruction *getActiveInstruction() const;
   
   /// \brief Get the stack-allocated area that contains an address.
   ///
@@ -361,6 +361,14 @@ public:
   ///
   RuntimeValue const *getCurrentRuntimeValue(llvm::Instruction const *I) const;
   
+  /// \brief Get a pointer to this \c FunctionState's parent.
+  ///
+  FunctionState const *getCaller() const;
+
+  /// \brief Get the N-th value from this \c FunctionState's active call.
+  ///
+  llvm::Value *getCurrentCallArgument(unsigned N) const;
+
   /// @}
   
   

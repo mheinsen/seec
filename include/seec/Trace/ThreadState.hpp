@@ -222,6 +222,12 @@ public:
   FunctionState const *getActiveFunction() const {
     return CallStack.empty() ? nullptr : CallStack.back().get();
   }
+
+  /// \brief Find the parent of the given \c FunctionState.
+  /// \return a const pointer to the \c FunctionState for the parent of the
+  ///         given \c FunctionState, or a \c nullptr if it has no parent.
+  ///
+  FunctionState const *getParentOf(FunctionState const &F) const;
   
   /// \brief Check if this thread is at the beginning of its trace.
   /// \return true iff this thread has not added any events.

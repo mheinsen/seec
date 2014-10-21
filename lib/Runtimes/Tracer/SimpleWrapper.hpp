@@ -76,7 +76,7 @@ struct ListenerNotifier
 {
   void operator()(seec::trace::TraceThreadListener &Listener,
                   uint32_t InstructionIndex,
-                  llvm::Instruction const *Instruction,
+                  llvm::Instruction *Instruction,
                   T Value) {
     // Convert to an unsigned, fixed-width integer type, because that is what
     // the notifyValue overloads expect, and if we leave it up to the compiler
@@ -96,7 +96,7 @@ struct ListenerNotifier
 {
   void operator()(seec::trace::TraceThreadListener &Listener,
                   uint32_t InstructionIndex,
-                  llvm::Instruction const *Instruction,
+                  llvm::Instruction *Instruction,
                   T Value) {
     Listener.notifyValue(InstructionIndex, Instruction, Value);
   }
@@ -108,7 +108,7 @@ struct ListenerNotifier
 {
   void operator()(seec::trace::TraceThreadListener &Listener,
                   uint32_t InstructionIndex,
-                  llvm::Instruction const *Instruction,
+                  llvm::Instruction *Instruction,
                   T Value) {
     Listener.notifyValue(InstructionIndex, Instruction, Value);
   }

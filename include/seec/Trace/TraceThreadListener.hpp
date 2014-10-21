@@ -508,10 +508,24 @@ public:
     return ActiveFunction;
   }
 
+  /// \brief Find the parent of the given \c TracedFunction.
+  /// \return a const pointer to the \c TracedFunction for the parent of the
+  ///         given \c TracedFunction, or a \c nullptr if it has no parent.
+  ///
+  TracedFunction const *getParentOf(TracedFunction const &F) const;
+
   /// \brief Get the current RuntimeValue associated with an Instruction.
   ///
   RuntimeValue const *getCurrentRuntimeValue(llvm::Instruction const *I) const;
   
+  /// \brief Get a pointer to the active function's parent's \c TracedFunction.
+  ///
+  TracedFunction const *getCaller() const;
+
+  /// \brief Get the N-th value from the active function's active call.
+  ///
+  llvm::Value *getCurrentCallArgument(unsigned N) const;
+
   /// \brief Get the area occupied by the given Argument in the active function.
   ///
   seec::Maybe<seec::MemoryArea>
@@ -612,13 +626,13 @@ public:
   /// \brief Receive the contents of envp.
   void notifyEnv(char **EnvP);
 
-  void notifyPreCall(uint32_t Index, llvm::CallInst const *Call,
+  void notifyPreCall(uint32_t Index, llvm::CallInst *Call,
                      void const *Address);
 
   void notifyPostCall(uint32_t Index, llvm::CallInst const *Call,
                       void const *Address);
 
-  void notifyPreCallIntrinsic(uint32_t Index, llvm::CallInst const *Call);
+  void notifyPreCallIntrinsic(uint32_t Index, llvm::CallInst *Call);
 
   void notifyPostCallIntrinsic(uint32_t Index, llvm::CallInst const *Call);
 
@@ -628,7 +642,7 @@ public:
                        uint64_t const ElemCount);
 
   void notifyPreLoad(uint32_t Index,
-                     llvm::LoadInst const *Load,
+                     llvm::LoadInst *Load,
                      void const *Address,
                      std::size_t Size);
 
@@ -638,7 +652,7 @@ public:
                       std::size_t Size);
 
   void notifyPreStore(uint32_t Index,
-                      llvm::StoreInst const *Store,
+                      llvm::StoreInst *Store,
                       void const *Address,
                       std::size_t Size);
 
@@ -651,38 +665,38 @@ public:
                        llvm::BinaryOperator const *Instruction);
 
   void notifyValue(uint32_t const Index,
-                   llvm::Instruction const * const Instruction);
+                   llvm::Instruction * const Instruction);
 
   void notifyValue(uint32_t Index,
-                   llvm::Instruction const *Instruction,
+                   llvm::Instruction * const Instruction,
                    void *Value);
 
   void notifyValue(uint32_t Index,
-                   llvm::Instruction const *Instruction,
+                   llvm::Instruction * const Instruction,
                    uint64_t Value);
 
   void notifyValue(uint32_t Index,
-                   llvm::Instruction const *Instruction,
+                   llvm::Instruction * const Instruction,
                    uint32_t Value);
 
   void notifyValue(uint32_t Index,
-                   llvm::Instruction const *Instruction,
+                   llvm::Instruction * const Instruction,
                    uint16_t Value);
 
   void notifyValue(uint32_t Index,
-                   llvm::Instruction const *Instruction,
+                   llvm::Instruction * const Instruction,
                    uint8_t Value);
 
   void notifyValue(uint32_t Index,
-                   llvm::Instruction const *Instruction,
+                   llvm::Instruction * const Instruction,
                    float Value);
 
   void notifyValue(uint32_t Index,
-                   llvm::Instruction const *Instruction,
+                   llvm::Instruction * const Instruction,
                    double Value);
   
   void notifyValue(uint32_t Index,
-                   llvm::Instruction const *Instruction,
+                   llvm::Instruction * const Instruction,
                    long double Value);
 
   /// @} (Thread Listener Notifications)
